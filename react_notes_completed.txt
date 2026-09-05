@@ -1,0 +1,298 @@
+REACT INTERVIEW PREPARATION NOTES
+Progress completed so far
+
+1. REACT INTRODUCTION
+React is a frontend JavaScript library used to build user interfaces.
+React applications are built using reusable components.
+React updates the UI efficiently when data changes.
+
+2. JSX
+JSX allows us to write HTML-like syntax inside JavaScript.
+Example:
+const element = <h1>Hello</h1>;
+
+JavaScript expressions can be used inside JSX with curly braces:
+<h1>{name}</h1>
+
+3. COMPONENTS
+A component is a reusable piece of UI.
+Components help divide a large UI into smaller, manageable pieces.
+
+Example:
+const Intro = () => {
+  return <h1>Welcome to React</h1>;
+};
+
+export default Intro;
+
+A component can be rendered inside another component:
+<Intro />
+
+4. IMPORT AND EXPORT
+Default export:
+export default Product;
+
+Import:
+import Product from "./Product";
+
+Named export:
+export { Skills };
+
+Named import:
+import { Skills } from "./Skills";
+
+5. PROPS
+Props are data passed from a parent component to a child component.
+They help us reuse the same component with different data.
+
+Example:
+<Product name="Laptop" price={50000} />
+
+Child component:
+const Product = (props) => {
+  return <h1>{props.name}</h1>;
+};
+
+Props destructuring:
+const Product = ({ name, price }) => {
+  return (
+    <>
+      <h1>{name}</h1>
+      <p>{price}</p>
+    </>
+  );
+};
+
+INTERVIEW:
+Props are data passed from a parent component to a child component. Props are read-only in the child component.
+
+6. EVENTS AND EVENT HANDLERS
+An event handler is a function that performs an action when an event occurs.
+
+Example:
+const handleClick = () => {
+  console.log("Hello");
+};
+
+<button onClick={handleClick}>Click</button>
+
+Function without arguments:
+onClick={handleClick}
+
+Function with arguments:
+onClick={() => handleAddToCart("Laptop")}
+
+Do not write:
+onClick={handleClick()}
+because it executes immediately during rendering.
+
+7. STATE AND useState
+State is data managed by a React component that can change over time.
+When state is updated using its setter function, React re-renders the component.
+
+Syntax:
+const [count, setCount] = useState(0);
+
+count = current state value
+setCount = function used to update state
+0 = initial state value
+
+Import:
+import { useState } from "react";
+
+Example:
+const handleIncrement = () => {
+  setCount(count + 1);
+};
+
+Functional update:
+setCount((previousCount) => previousCount + 1);
+
+Do not directly modify state:
+count = count + 1;
+
+Use the setter instead:
+setCount(count + 1);
+
+8. COUNTER PRACTICE
+Built a counter with:
+- Increment
+- Decrement
+- Reset
+- Preventing the value from going below 0
+
+Example logic:
+const handleDecrement = () => {
+  if (count > 0) {
+    setCount(count - 1);
+  }
+};
+
+9. CONDITIONAL RENDERING
+Conditional rendering means displaying different UI based on a condition or state.
+
+Ternary operator:
+{isLoggedIn ? <h1>Welcome</h1> : <h1>Please Login</h1>}
+
+If true -> first UI
+If false -> second UI
+
+&& operator:
+{isLoggedIn && <h1>Welcome</h1>}
+
+If true -> display UI
+If false -> display nothing
+
+Example login state:
+const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+Login:
+setIsLoggedIn(true);
+
+Logout:
+setIsLoggedIn(false);
+
+10. LISTS AND map()
+map() goes through every item in an array and returns a new array.
+
+React uses map() to convert array data into UI.
+
+Example:
+const products = [
+  { id: 1, name: "Laptop", price: 50000 },
+  { id: 2, name: "Phone", price: 30000 },
+  { id: 3, name: "Watch", price: 10000 }
+];
+
+Rendering:
+{products.map((product) => (
+  <li>{product.name} - {product.price}</li>
+))}
+
+Important:
+If using curly braces in an arrow function body, explicitly return the JSX:
+products.map((product) => {
+  return <li>{product.name}</li>;
+})
+
+If using parentheses, JSX is implicitly returned:
+products.map((product) => (
+  <li>{product.name}</li>
+))
+
+11. key PROP
+When rendering lists, each item needs a unique key.
+
+Example:
+{products.map((product) => (
+  <li key={product.id}>
+    {product.name}
+  </li>
+))}
+
+Why?
+React uses keys to identify which list items are added, removed, or changed.
+
+INTERVIEW:
+A key is a unique identifier used when rendering lists. It helps React efficiently identify items when the list changes.
+
+12. REUSABLE PRODUCT COMPONENT
+We combined:
+Components + Props + map() + key
+
+App has product data:
+const products = [
+  { id: 1, name: "Laptop", price: 50000 },
+  { id: 2, name: "Phone", price: 30000 }
+];
+
+App renders Product components:
+{products.map((product) => (
+  <li key={product.id}>
+    <Product
+      name={product.name}
+      price={product.price}
+    />
+  </li>
+))}
+
+Product component:
+const Product = ({ name, price }) => {
+  return (
+    <div>
+      <h1>Product Name: {name}</h1>
+      <h1>Product Price: {price}</h1>
+    </div>
+  );
+};
+
+export default Product;
+
+Important:
+Put the key on the outer element directly returned by map().
+In the above example, map() returns the li, so key goes on:
+<li key={product.id}>
+
+CURRENT PROGRESS
+COMPLETED:
+[✓] React Intro
+[✓] JSX
+[✓] Components
+[✓] Import / Export
+[✓] Props
+[✓] Events
+[✓] useState
+[✓] Conditional Rendering
+[✓] Lists
+[✓] map()
+[✓] key
+[✓] Reusable Product Component
+
+NEXT TOPICS:
+1. React Forms
+2. useEffect
+3. API Calls
+4. Loading and Error States
+5. Component Communication / Lifting State
+6. Basic Project Structure
+7. React Router
+8. Other Hooks at interview level:
+   - useContext
+   - useRef
+   - useReducer
+   - useMemo
+   - useCallback
+   - Custom Hooks
+9. Build a complete small interactive UI
+10. React interview revision
+
+KEY ARCHITECTURE TO REMEMBER:
+Data
+↓
+State / Props
+↓
+Component
+↓
+JSX
+↓
+React renders UI
+
+For lists:
+Array Data
+↓
+map()
+↓
+Component / JSX for each item
+↓
+React displays the list
+
+For interaction:
+User Event
+↓
+Event Handler
+↓
+Update State using setter
+↓
+React re-renders
+↓
+Updated UI
