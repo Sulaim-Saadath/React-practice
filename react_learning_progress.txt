@@ -1,0 +1,297 @@
+React Interview Preparation — Progress So Far
+
+COMPLETED BEFORE THIS CHAT
+- React introduction
+- JSX and basic rendering
+- Components
+- Parent and child components
+- Import and export
+- Props
+- Props destructuring
+- Events and event handlers
+- Passing arguments to event handlers
+- useState
+- State updates
+- Counter: increment, decrement, reset
+- Preventing negative count using conditions
+- Conditional rendering
+- Ternary operator
+- && conditional rendering
+- Lists
+- map()
+- key
+- Reusable Product component
+
+IMPORTANT LIST / KEY REVISION
+- map() is used to transform an array into JSX elements.
+- The key should be placed on the outer element directly returned by map().
+- Example idea:
+  products.map((product) => (
+    <li key={product.id}>
+      <Product name={product.name} price={product.price} />
+    </li>
+  ))
+- Keys help React identify list items between renders and efficiently handle changes such as adding, removing, or reordering items.
+
+REACT FORMS — COMPLETED IN THIS CHAT
+
+1. INPUT + onChange
+- Form input values can be stored in React state.
+- event.target.value gives the current value entered/selected by the user.
+- onChange runs when a form field's value changes.
+
+Basic idea:
+const [name, setName] = useState("");
+
+<input
+  value={name}
+  onChange={(event) => setName(event.target.value)}
+/>
+
+2. CONTROLLED COMPONENTS
+- A controlled component is a form element whose displayed value is controlled by React state.
+- value tells the input what to display from state.
+- onChange handles user changes and updates state.
+- Important flow:
+  User changes input
+  -> onChange runs
+  -> state updates
+  -> React re-renders
+  -> value displays the updated state
+- If value is given without an onChange that updates the state, the user cannot type normally because React keeps supplying the unchanged state value.
+
+3. MULTIPLE INPUTS
+- We used separate state initially:
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+- We then used one object state for related form fields:
+  const [formData, setFormData] = useState({
+    name: "",
+    email: ""
+  });
+
+4. UPDATING OBJECT STATE
+- When updating one property, keep the other properties with the spread operator:
+  setFormData({
+    ...formData,
+    name: event.target.value
+  });
+
+5. ONE handleChange FOR MULTIPLE INPUTS
+- Each input can have a name attribute:
+  name="name"
+  name="email"
+- event.target.name identifies which input changed.
+- event.target.value gives the new value.
+- A switch statement was used because it was easier to understand:
+
+const handleChange = (event) => {
+  switch (event.target.name) {
+    case "name":
+      setFormData({
+        ...formData,
+        name: event.target.value
+      });
+      break;
+    case "email":
+      setFormData({
+        ...formData,
+        email: event.target.value
+      });
+      break;
+    default:
+      break;
+  }
+};
+
+- The shorter dynamic-property approach was also introduced:
+  setFormData({
+    ...formData,
+    [event.target.name]: event.target.value
+  });
+- The switch approach is valid and currently easier for understanding.
+
+6. TEXTAREA
+- textarea follows the same controlled-component pattern:
+  value={formData.message}
+  onChange={handleChange}
+- Added message to formData:
+  message: ""
+- Added a "message" case to handleChange.
+
+7. SELECT
+- select also follows the same controlled pattern.
+- Added:
+  role: ""
+- select uses:
+  name="role"
+  value={formData.role}
+  onChange={handleChange}
+- Added options such as Developer, Student, and Admin.
+- A useful UX improvement is:
+  <option value="">Select a role</option>
+
+8. FORM SUBMISSION
+- Inputs can be wrapped in:
+  <form onSubmit={handleSubmit}>
+- A submit button uses:
+  <button type="submit">Submit</button>
+- Normal browser form submission reloads/navigates the page.
+
+9. preventDefault()
+- event.preventDefault() stops the browser's default form submission behavior.
+- It does NOT make data persistent.
+- It allows React code to control what happens next, such as validation, API calls, or showing success/error messages.
+
+Example:
+const handleSubmit = (event) => {
+  event.preventDefault();
+};
+
+10. SHOW DATA ONLY AFTER SUBMIT
+- formData stores the values while the user is editing.
+- A separate state was created for submitted data:
+  const [submitData, setSubmitData] = useState(null);
+- On submit:
+  setSubmitData(formData);
+- Because submitData is initially null, accessing submitData.name immediately would cause an error.
+- Conditional rendering solves this:
+
+{submitData && (
+  <>
+    <h1>{submitData.name}</h1>
+    <h1>{submitData.email}</h1>
+    <h1>{submitData.message}</h1>
+    <h1>{submitData.role}</h1>
+  </>
+)}
+
+- Flow:
+  Before submit -> submitData is null -> nothing displays
+  After submit -> submitData contains an object -> submitted data displays
+
+FORM INTERVIEW REVISION
+- Controlled component:
+  A form element whose value is controlled by React state. value displays state and onChange updates state.
+- onChange:
+  Runs when the value of a form field changes. Commonly used to update state.
+- onSubmit:
+  Runs when the form is submitted. Used for actions such as validation or API calls.
+- preventDefault():
+  Stops the browser's default form submission behavior, such as page reload/navigation.
+
+useEffect — STARTED IN THIS CHAT
+
+1. RELATION BETWEEN STATE AND RENDERING
+- Calling a setter such as:
+  setName("Saadath")
+  updates state and causes React to re-render so the UI can reflect the new state.
+
+2. WHAT useEffect IS
+- useEffect is used to perform side effects related to rendering or changes in data.
+- Common examples:
+  - Fetching data from an API
+  - Updating the browser tab title
+  - Timers
+  - Other work outside normal JSX rendering
+
+Basic syntax:
+useEffect(() => {
+  // code to run
+});
+
+3. useEffect WITHOUT A DEPENDENCY ARRAY
+useEffect(() => {
+  console.log("Component rendered");
+});
+
+- Runs after every render.
+- Initial render -> effect runs.
+- State changes -> component re-renders -> effect runs again.
+
+4. useEffect WITH AN EMPTY DEPENDENCY ARRAY
+useEffect(() => {
+  console.log("Effect ran");
+}, []);
+
+- Intended to run after the component initially mounts.
+- Common use case: fetch initial data once when a component opens.
+- In React development mode, React.StrictMode can cause effects to run extra times for development checks. Do not remove StrictMode just to hide logs.
+
+5. useEffect WITH A DEPENDENCY
+Example:
+useEffect(() => {
+  console.log("Current count:", count);
+}, [count]);
+
+- Runs after the initial render.
+- Runs again whenever count changes.
+- If some other state changes but count does not change, this effect does not run because of that other state's change.
+
+PRACTICAL CODE WRITTEN
+
+import React, { useEffect, useState } from 'react'
+
+const App3 = () => {
+  const [count, setCount] = useState(0)
+
+  const handleCount = () => {
+    setCount(count + 1)
+  }
+
+  useEffect(() => {
+    console.log("Button Clicked" + count);
+  }, [count])
+
+  return (
+    <>
+      <h1>Counter: {count}</h1>
+      <button onClick={handleCount}>Increment</button>
+    </>
+  )
+}
+
+export default App3
+
+- The code is correct.
+- Better log wording would be:
+  console.log("Current count:", count);
+  because the effect also runs on the initial render before a button click.
+
+IMPORTANT useEffect PATTERNS TO REMEMBER
+
+1. No dependency array:
+useEffect(() => {
+  // runs after every render
+});
+
+2. Empty dependency array:
+useEffect(() => {
+  // runs after initial mount
+}, []);
+
+3. Specific dependency:
+useEffect(() => {
+  // runs after initial render and when count changes
+}, [count]);
+
+CURRENT NEXT STEP
+- Continue useEffect from the exact point below:
+  Two states exist: count and name.
+  An effect depends only on [count].
+  Question:
+  If name changes but count does not change, will the effect run because of the name change?
+- After answering and understanding this, continue useEffect with dependency arrays and practical examples.
+- Then move to API calls:
+  fetch
+  async/await
+  JSON
+  useEffect with API calls
+  loading state
+  error state
+  connecting React to a Spring Boot backend
+
+LEARNING STATUS
+- React Forms: Completed at interview/practical level.
+- useEffect: Started; basic concept and dependency-array patterns introduced.
+- Next major milestone after useEffect: API calls.

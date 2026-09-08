@@ -1,0 +1,756 @@
+REACT INTERVIEW PREPARATION – PROGRESS & REMAINING ROADMAP
+==============================================================
+
+COMPLETED TOPICS
+================
+
+1. React Basics
+---------------
+- What React is
+- JSX
+- Basic rendering
+- Components
+- Parent and child components
+- Import and export
+
+Small example:
+const Header = () => {
+  return <h1>Hello</h1>;
+};
+
+export default Header;
+
+
+2. Props
+--------
+- Passing data from parent to child
+- Props destructuring
+- Reusable components
+
+Example:
+const Product = ({ name, price }) => {
+  return (
+    <>
+      <h2>{name}</h2>
+      <p>{price}</p>
+    </>
+  );
+};
+
+
+3. Events
+---------
+- Event handlers
+- onClick
+- Passing arguments to event handlers
+
+Example:
+const handleClick = () => {
+  console.log("Clicked");
+};
+
+<button onClick={handleClick}>Click</button>
+
+
+4. useState and State Updates
+-----------------------------
+- useState
+- State updates cause React to re-render so the UI can reflect the new state
+- Counter increment
+- Decrement
+- Reset
+- Preventing negative values using conditions
+
+Example:
+const [count, setCount] = useState(0);
+
+const increment = () => {
+  setCount(count + 1);
+};
+
+
+5. Conditional Rendering
+------------------------
+- Ternary operator
+- && conditional rendering
+
+Examples:
+{isLoggedIn ? <h1>Welcome</h1> : <h1>Please Login</h1>}
+
+{error && <p>{error}</p>}
+
+
+6. Lists, map() and key
+-----------------------
+- Rendering arrays using map()
+- Why key is needed
+- Reusable Product component
+- Mapping products to props
+
+Example:
+{products.map((product) => (
+  <div key={product.id}>
+    {product.name}
+  </div>
+))}
+
+
+7. React Forms
+--------------
+Learned:
+- input
+- onChange
+- Controlled components
+- Multiple inputs
+- Object state for form data
+- Spread operator when updating object state
+- Shared handleChange
+- textarea
+- select
+- form
+- onSubmit
+- preventDefault
+- Submitted data state
+- Conditional rendering of submitted data
+
+Important notes:
+- value controls what the form field displays from state.
+- onChange handles a value change and updates state.
+- Controlled component = value controlled by React state + onChange updates state.
+- preventDefault stops the browser's default form submission behavior.
+- preventDefault does NOT make data persistent.
+
+Example:
+const [name, setName] = useState("");
+
+<input
+  value={name}
+  onChange={(event) => setName(event.target.value)}
+/>
+
+
+8. useEffect
+------------
+Learned:
+- useEffect is used for side effects
+- API calls
+- Updating document title
+- Timers
+
+A) No dependency array:
+useEffect(() => {
+  console.log("Runs after every render");
+});
+
+B) Empty dependency array:
+useEffect(() => {
+  console.log("Runs after initial mount");
+}, []);
+
+Note: React StrictMode in development can cause extra effect runs/logs.
+
+C) Dependency array:
+useEffect(() => {
+  console.log("Current count:", count);
+}, [count]);
+
+This runs after the initial render and again when count changes.
+
+Important understanding:
+If the component has:
+const [count, setCount] = useState(0);
+const [name, setName] = useState("");
+
+and:
+useEffect(() => {
+  console.log("Effect ran");
+}, [count]);
+
+If name changes:
+- Component re-renders: YES
+- Effect runs because of name change: NO
+
+The effect runs again when a value in its dependency array changes.
+
+Document title example:
+useEffect(() => {
+  document.title = "Count: " + count;
+}, [count]);
+
+
+9. useEffect Cleanup and setInterval
+------------------------------------
+Learned:
+- setInterval(function, timeInMilliseconds)
+- setInterval repeatedly runs code after the specified interval
+- clearInterval(timer) stops the interval
+- Cleanup function is returned from useEffect
+
+Example:
+useEffect(() => {
+  const timer = setInterval(() => {
+    setSeconds((previousSeconds) => previousSeconds + 1);
+  }, 1000);
+
+  return () => {
+    clearInterval(timer);
+  };
+}, []);
+
+Simple understanding:
+useEffect starts the interval.
+timer stores the interval ID/reference.
+The returned cleanup function runs when cleanup is needed, such as component unmounting.
+clearInterval(timer) stops the repeating interval.
+
+
+10. Real API Calls: React -> Spring Boot -> MySQL
+-------------------------------------------------
+Built a tiny CRUD-style practical application:
+- Add Product
+- Get All Products
+- React frontend
+- Spring Boot backend
+- MySQL database
+
+Backend already created:
+- Product Entity
+- Repository
+- Service
+- Controller
+- Database connection
+
+Endpoints:
+POST /api/addProduct
+GET  /api/getAllProducts
+
+Learned:
+- fetch()
+- GET requests
+- POST requests
+- response
+- response.ok
+- response.json()
+- JSON response
+- JSON.stringify()
+- .then()
+- .catch()
+- .finally()
+- async/await
+- try/catch/finally
+- loading state
+- error state
+- useEffect for initial API loading
+- Refreshing the product list after adding a product
+
+POST example:
+const response = await fetch("http://localhost:8080/api/addProduct", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(product)
+});
+
+if (!response.ok) {
+  throw new Error("Failed to add product");
+}
+
+Important:
+The POST endpoint returns one Product object.
+If products state is later used with products.map(...), it must remain an array.
+
+Wrong idea:
+setProducts(data); // if data is one product object
+products.map(...); // error because object does not have map()
+
+Better:
+After successful POST:
+setName("");
+setPrice("");
+await getAllProducts();
+
+GET example with async/await:
+async function getAllProducts() {
+  try {
+    setLoading(true);
+    setError("");
+
+    const response = await fetch(
+      "http://localhost:8080/api/getAllProducts"
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to get products");
+    }
+
+    const data = await response.json();
+    setProducts(data);
+
+  } catch (error) {
+    setError(error.message);
+
+  } finally {
+    setLoading(false);
+  }
+}
+
+catch vs finally:
+- catch runs when an error is handled in the promise/async flow.
+- finally runs regardless of success or failure.
+
+
+11. Parent -> Child Communication
+---------------------------------
+Parent passes data through props.
+
+Example:
+<Child name={name} />
+
+Child:
+const Child = ({ name }) => {
+  return <h1>{name}</h1>;
+};
+
+
+12. Child -> Parent Communication
+---------------------------------
+The parent creates a function and passes it to the child as a prop.
+The child calls that function.
+
+Parent:
+const receiveMessage = (data) => {
+  setMessage(data);
+};
+
+<Child sendMessage={receiveMessage} />
+
+Child:
+<button onClick={() => sendMessage("Hello from Child")}>
+  Send
+</button>
+
+Important:
+- sendMessage = prop name
+- receiveMessage = actual parent function
+
+Flow:
+Child calls sendMessage(...)
+-> parent function receiveMessage(...) runs
+-> parent state updates
+
+
+13. Lifting State Up
+--------------------
+Learned when two sibling components need the same shared data.
+
+Example structure:
+App
+├── Search
+└── ProductList
+
+State is kept in their nearest common parent:
+
+const [search, setSearch] = useState("");
+
+<Search search={search} setSearch={setSearch} />
+<ProductList search={search} />
+
+Search can update the parent's state:
+<input
+  value={search}
+  onChange={(event) => setSearch(event.target.value)}
+/>
+
+ProductList can read the same updated value:
+const ProductList = ({ search }) => {
+  return <h1>{search}</h1>;
+};
+
+Rule:
+- Pass state value when a child needs to read it.
+- Pass setter/callback when a child needs to update it.
+
+
+14. filter() Practical Example
+------------------------------
+Used shared search state to filter products.
+
+const products = ["Laptop", "Phone", "Mouse", "Keyboard"];
+
+const filteredProducts = products.filter((product) =>
+  product.toLowerCase().includes(search.toLowerCase())
+);
+
+{filteredProducts.map((product) => (
+  <h2 key={product}>{product}</h2>
+))}
+
+Flow:
+User types
+-> Search updates parent search state
+-> App re-renders
+-> ProductList receives search
+-> filter() keeps matching products
+-> map() displays them
+
+
+15. Basic React Project Structure
+---------------------------------
+Understood the basic idea of:
+
+src/
+├── main.jsx
+├── App.jsx
+├── components/
+├── pages/
+└── services/
+
+Learned:
+- main.jsx starts/renders the React app
+- App.jsx is the root/main component
+- components = reusable UI pieces
+- pages = complete screens/routes
+- services can contain reusable API functions
+
+Service example:
+export const getAllProducts = async () => {
+  const response = await fetch("http://localhost:8080/api/getAllProducts");
+  return response.json();
+};
+
+Import example:
+import { getAllProducts } from "../services/productService";
+
+Note:
+I am comfortable writing API logic directly inside components, so service files are not currently a priority.
+
+
+16. React Router
+----------------
+COMPLETED:
+- Installing react-router-dom
+- BrowserRouter
+- Routes
+- Route
+- Link
+- useNavigate
+
+Basic setup:
+
+main.jsx:
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App.jsx";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+);
+
+Routes:
+import { Routes, Route } from "react-router-dom";
+
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/about" element={<About />} />
+</Routes>
+
+Link:
+import { Link } from "react-router-dom";
+
+<Link to="/">Home</Link>
+<Link to="/about">About</Link>
+
+useNavigate:
+import { useNavigate } from "react-router-dom";
+
+const navigate = useNavigate();
+
+navigate("/about");
+
+Use useNavigate when navigation happens programmatically, for example:
+- successful login
+- successful form submission
+- navigation based on application logic
+
+
+REMAINING TOPICS
+================
+
+Priority order because time is limited:
+
+1. useParams() – HIGH PRIORITY
+2. useContext() – HIGH PRIORITY
+3. useRef() – HIGH PRIORITY
+4. useReducer() – MEDIUM/HIGH PRIORITY
+5. Custom Hooks – MEDIUM PRIORITY
+6. useMemo() – Interview-level understanding
+7. useCallback() – Interview-level understanding
+8. Small practical revision project
+
+
+1. useParams()
+--------------
+Purpose:
+Get dynamic values from the URL.
+
+Example URL:
+/products/10
+
+Route:
+<Route path="/products/:id" element={<ProductDetails />} />
+
+Component:
+import { useParams } from "react-router-dom";
+
+const ProductDetails = () => {
+  const { id } = useParams();
+
+  return <h1>Product ID: {id}</h1>;
+};
+
+export default ProductDetails;
+
+Simple idea:
+URL /products/10
+-> id = "10"
+
+
+2. useContext()
+---------------
+Purpose:
+Share data between components without passing props through every intermediate component.
+
+Problem: Prop drilling
+
+App
+ ↓ props
+ComponentA
+ ↓ props
+ComponentB
+ ↓ props
+ComponentC
+
+Context allows shared data to be accessed where needed.
+
+Small example:
+
+import { createContext, useContext } from "react";
+
+const ThemeContext = createContext();
+
+function App() {
+  return (
+    <ThemeContext.Provider value="dark">
+      <Child />
+    </ThemeContext.Provider>
+  );
+}
+
+function Child() {
+  const theme = useContext(ThemeContext);
+  return <h1>{theme}</h1>;
+}
+
+
+3. useRef()
+-----------
+Main interview uses:
+- Access a DOM element directly
+- Focus an input
+- Store a mutable value without causing a re-render
+
+Small example:
+
+import { useRef } from "react";
+
+const App = () => {
+  const inputRef = useRef();
+
+  const focusInput = () => {
+    inputRef.current.focus();
+  };
+
+  return (
+    <>
+      <input ref={inputRef} />
+      <button onClick={focusInput}>Focus</button>
+    </>
+  );
+};
+
+
+4. useReducer()
+---------------
+Purpose:
+Manage more complex state updates in a structured way.
+
+Basic idea:
+state + action
+-> reducer decides how state changes
+-> new state
+
+Small example:
+
+import { useReducer } from "react";
+
+const reducer = (state, action) => {
+  if (action.type === "increment") {
+    return { count: state.count + 1 };
+  }
+
+  return state;
+};
+
+const App = () => {
+  const [state, dispatch] = useReducer(reducer, { count: 0 });
+
+  return (
+    <>
+      <h1>{state.count}</h1>
+      <button onClick={() => dispatch({ type: "increment" })}>
+        Increment
+      </button>
+    </>
+  );
+};
+
+
+5. Custom Hooks
+---------------
+Purpose:
+Reuse stateful React logic.
+
+Hook names normally start with "use".
+
+Small example:
+
+import { useState } from "react";
+
+const useCounter = () => {
+  const [count, setCount] = useState(0);
+
+  const increment = () => {
+    setCount(count + 1);
+  };
+
+  return { count, increment };
+};
+
+Using it:
+const { count, increment } = useCounter();
+
+
+6. useMemo()
+------------
+Purpose:
+Memoize a calculated value so React can reuse it instead of recalculating unnecessarily when dependencies have not changed.
+
+Small example:
+
+import { useMemo } from "react";
+
+const total = useMemo(() => {
+  return price * quantity;
+}, [price, quantity]);
+
+Interview-level idea:
+useMemo remembers a computed VALUE.
+
+
+7. useCallback()
+----------------
+Purpose:
+Memoize a function reference.
+
+Small example:
+
+import { useCallback } from "react";
+
+const handleClick = useCallback(() => {
+  console.log("Clicked");
+}, []);
+
+Interview-level idea:
+- useMemo memoizes a VALUE.
+- useCallback memoizes a FUNCTION.
+
+
+8. Small Practical Revision Project
+-----------------------------------
+Build a small interactive React application from scratch combining:
+
+- Components
+- Props
+- Events
+- useState
+- Forms
+- Conditional rendering
+- Lists
+- map()
+- key
+- filter()
+- useEffect
+- API calls
+- Loading state
+- Error state
+- React Router
+- useParams where suitable
+- useContext where suitable
+
+
+INTERVIEW REVISION QUESTIONS TO KEEP PRACTICING
+===============================================
+
+1. What is JSX?
+2. What is a React component?
+3. What are props?
+4. What is the difference between props and state?
+5. What happens when state changes?
+6. What is a controlled component?
+7. Why do we use preventDefault() in a form?
+8. What is conditional rendering?
+9. Why do we need a key when using map()?
+10. What is useEffect used for?
+11. What is the difference between [], [count], and no dependency array?
+12. What is a cleanup function in useEffect?
+13. Why use clearInterval()?
+14. What is fetch()?
+15. What does response.json() do?
+16. What does JSON.stringify() do?
+17. What is async/await?
+18. Difference between catch and finally?
+19. How do you handle loading and API errors?
+20. How do you send data from parent to child?
+21. How do you send data from child to parent?
+22. What does lifting state up mean?
+23. What is React Router?
+24. Difference between Link and useNavigate?
+25. What is useParams?
+26. What problem does useContext solve?
+27. What is useRef used for?
+28. When might useReducer be better than useState?
+29. Difference between useMemo and useCallback?
+30. What is a custom hook?
+
+
+CURRENT CHECKPOINT
+==================
+
+Next topic to learn:
+1. useParams()
+Then:
+2. useContext()
+3. useRef()
+4. useReducer()
+5. Custom Hooks
+6. useMemo()
+7. useCallback()
+8. Small practical revision project
+
+Current progress:
+The core React foundation is covered, including practical forms, useEffect, real GET/POST API calls with Spring Boot and MySQL, component communication, lifting state up, filtering, and the main React Router basics.
+
+Focus next on completing the remaining hooks and practical routing quickly, then revise through a small project and interview questions.
